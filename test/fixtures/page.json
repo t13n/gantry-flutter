@@ -1,0 +1,10 @@
+{
+  "key": "kvkk",
+  "schemaVersion": 1,
+  "title": { "tr": "KVKK Aydınlatma Metni" },
+  "body": {
+    "markdown": { "tr": "## Amaç\n\nKişisel verileriniz…" },
+    "html": { "tr": "<h2>Amaç</h2>\n<p>Kişisel verileriniz…</p>" }
+  },
+  "publishedAt": "2026-10-08T09:12:00.000Z"
+}

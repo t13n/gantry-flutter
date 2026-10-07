@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "key": "yaz-kampanyasi",
+      "schemaVersion": 1,
+      "category": "kampanya",
+      "title": { "tr": "Yaz kampanyası", "en": "Summer deal" },
+      "summary": { "tr": "Yaz boyunca indirim", "en": "Discounts all summer" },
+      "body": {
+        "markdown": { "tr": "**Yaz** boyunca…" },
+        "html": { "tr": "<p><strong>Yaz</strong> boyunca…</p>" }
+      },
+      "imageUrl": "https://cdn.example.com/summer.png",
+      "action": { "type": "webPage", "url": "https://example.com/summer", "trackingEvent": "summer_tap" },
+      "startAt": "2026-10-10T00:00:00.000Z",
+      "endAt": null,
+      "publishedAt": "2026-10-08T09:12:00.000Z"
+    },
+    {
+      "key": "bakim-duyurusu",
+      "schemaVersion": 1,
+      "category": "duyuru",
+      "title": { "tr": "Planlı bakım" },
+      "summary": null,
+      "body": null,
+      "imageUrl": null,
+      "action": null,
+      "startAt": null,
+      "endAt": null,
+      "publishedAt": "2026-10-08T09:15:00.000Z"
+    }
+  ]
+}

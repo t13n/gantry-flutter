@@ -1,0 +1,22 @@
+{
+  "id": "splash-deeplink",
+  "schemaVersion": 1,
+  "enabled": true,
+  "startAt": "2026-09-30T21:00:00.000Z",
+  "endAt": "2026-11-01T20:59:00.000Z",
+  "platform": ["all"],
+  "minAppVersion": "2.0.0",
+  "frequency": { "type": "once" },
+  "audience": { "type": "all" },
+  "priority": 100,
+  "content": {
+    "title": { "tr": "Sağlıklı Şehirler", "en": "Healthy Cities" },
+    "description": { "tr": "Ankete katılın, şehrinizi öne çıkarın.", "en": "Take the survey for your city." },
+    "imageUrl": "https://cdn.example.com/healthy-cities.png",
+    "a11yLabel": { "tr": "Sağlıklı Şehirler kampanya görseli", "en": "Healthy Cities campaign image" },
+    "primaryButtonLabel": { "tr": "Hemen Katıl", "en": "Join Now" },
+    "primaryAction": { "type": "redirect", "deeplink": "blua://app/blua/health-coach-survey", "trackingEvent": "healthy_cities_join_click" },
+    "secondaryButtonLabel": { "tr": "Beni arayın", "en": "Call me" },
+    "secondaryAction": { "type": "lead" }
+  }
+}
