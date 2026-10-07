@@ -9,7 +9,17 @@ sealed class GantryException implements Exception {
   final String message;
 
   @override
-  String toString() => '$runtimeType: $message';
+  String toString() => '$_name: $message';
+
+  // Written out because runtimeType is minified in obfuscated builds.
+  String get _name => switch (this) {
+        GantryNetworkException() => 'GantryNetworkException',
+        GantryUnauthorizedException() => 'GantryUnauthorizedException',
+        GantryRateLimitedException() => 'GantryRateLimitedException',
+        GantryServerException() => 'GantryServerException',
+        GantryRequestException() => 'GantryRequestException',
+        GantryNotIdentifiedException() => 'GantryNotIdentifiedException',
+      };
 }
 
 /// The server could not be reached or did not answer in time.
@@ -44,7 +54,7 @@ final class GantryServerException extends GantryException {
   final int statusCode;
 
   @override
-  String toString() => '$runtimeType: $message (HTTP $statusCode)';
+  String toString() => '${super.toString()} (HTTP $statusCode)';
 }
 
 /// The server rejected the request (HTTP 400).

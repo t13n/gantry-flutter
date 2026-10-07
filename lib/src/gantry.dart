@@ -47,7 +47,7 @@ class Gantry {
   ///   remembers which interstitials were shown.
   /// * [onLog] receives the SDK's log events. Nothing is printed without it.
   ///
-  /// Throws an [ArgumentError] for a malformed key or version, or a
+  /// Throws an [ArgumentError] for a malformed key, version or address, or a
   /// platform that cannot be detected.
   factory Gantry({
     required String apiKey,
@@ -67,6 +67,12 @@ class Gantry {
       );
     }
     AppVersion.parse(appVersion);
+    if (baseUrl != null &&
+        (!const {'http', 'https'}.contains(baseUrl.scheme) ||
+            baseUrl.host.isEmpty)) {
+      throw ArgumentError.value(
+          baseUrl, 'baseUrl', 'must be an http or https address');
+    }
     final resolvedPlatform = platform ?? _detectPlatform();
 
     DateTime now() => DateTime.now();

@@ -16,8 +16,7 @@ bool isEligible(
   return interstitial.enabled &&
       !now.isBefore(interstitial.startAt) &&
       now.isBefore(interstitial.endAt) &&
-      (interstitial.platforms.contains('all') ||
-          interstitial.platforms.contains(platform.name)) &&
+      interstitial.platforms.contains(platform) &&
       minimum != null &&
       appVersion >= minimum;
 }

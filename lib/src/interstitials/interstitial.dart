@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show setEquals;
+
 import '../common/app_version.dart';
 import '../common/gantry_action.dart';
+import '../common/gantry_platform.dart';
 import '../common/localized_text.dart';
 
 /// How often one campaign may be shown on a device.
@@ -60,8 +63,8 @@ class Interstitial {
   /// Moment the campaign stops being shown.
   final DateTime endAt;
 
-  /// Target platforms: `all`, `ios`, `android`.
-  final Set<String> platforms;
+  /// The platforms the campaign is meant for. Cannot be modified.
+  final Set<GantryPlatform> platforms;
 
   /// Lowest app version the campaign is meant for.
   final String minAppVersion;
@@ -98,6 +101,51 @@ class Interstitial {
 
   /// What the second button does, when there is one.
   final GantryAction? secondaryAction;
+
+  @override
+  bool operator ==(Object other) =>
+      other is Interstitial &&
+      other.id == id &&
+      other.enabled == enabled &&
+      other.startAt == startAt &&
+      other.endAt == endAt &&
+      other.minAppVersion == minAppVersion &&
+      other.frequency == frequency &&
+      other.audience == audience &&
+      other.priority == priority &&
+      other.title == title &&
+      other.description == description &&
+      other.imageUrl == imageUrl &&
+      other.a11yLabel == a11yLabel &&
+      other.primaryButtonLabel == primaryButtonLabel &&
+      other.primaryAction == primaryAction &&
+      other.secondaryButtonLabel == secondaryButtonLabel &&
+      other.secondaryAction == secondaryAction &&
+      setEquals(other.platforms, platforms);
+
+  @override
+  int get hashCode => Object.hash(
+        id,
+        enabled,
+        startAt,
+        endAt,
+        minAppVersion,
+        frequency,
+        audience,
+        priority,
+        title,
+        description,
+        imageUrl,
+        a11yLabel,
+        primaryButtonLabel,
+        primaryAction,
+        secondaryButtonLabel,
+        secondaryAction,
+        Object.hashAllUnordered(platforms),
+      );
+
+  @override
+  String toString() => 'Interstitial($id)';
 
   /// Reads the JSON text of a campaign.
   ///
@@ -189,10 +237,17 @@ class Interstitial {
   static DateTime? _date(Object? value) =>
       value is String ? DateTime.tryParse(value) : null;
 
-  static Set<String>? _platforms(Object? value) {
+  /// `all` stands for every platform; a name this SDK does not know is ignored.
+  static Set<GantryPlatform>? _platforms(Object? value) {
     if (value is! List || value.isEmpty) return null;
-    final platforms = value.whereType<String>().toSet();
-    return platforms.length == value.length ? platforms : null;
+    if (value.any((name) => name is! String)) return null;
+    final platforms = value.contains('all')
+        ? GantryPlatform.values.toSet()
+        : {
+            for (final platform in GantryPlatform.values)
+              if (value.contains(platform.name)) platform,
+          };
+    return Set.unmodifiable(platforms);
   }
 
   static Uri? _httpUrl(Object? value) {

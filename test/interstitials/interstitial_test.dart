@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gantry/src/common/gantry_action.dart';
+import 'package:gantry/src/common/gantry_platform.dart';
 import 'package:gantry/src/interstitials/interstitial.dart';
 
 import '../support/fixtures.dart';
@@ -14,7 +15,7 @@ void main() {
     expect(interstitial.enabled, isTrue);
     expect(interstitial.startAt, DateTime.utc(2026, 9, 30, 21));
     expect(interstitial.endAt, DateTime.utc(2026, 11, 1, 20, 59));
-    expect(interstitial.platforms, {'all'});
+    expect(interstitial.platforms, GantryPlatform.values.toSet());
     expect(interstitial.minAppVersion, '2.0.0');
     expect(interstitial.frequency, InterstitialFrequency.once);
     expect(interstitial.audience, InterstitialAudience.all);
@@ -42,7 +43,7 @@ void main() {
     final interstitial = Interstitial.fromJson(json)!;
     expect(interstitial.audience, InterstitialAudience.customers);
     expect(interstitial.frequency, InterstitialFrequency.everyLaunch);
-    expect(interstitial.platforms, {'ios', 'android'});
+    expect(interstitial.platforms, GantryPlatform.values.toSet());
   });
 
   test('the secondary button is optional', () {

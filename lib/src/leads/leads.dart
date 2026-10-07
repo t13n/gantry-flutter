@@ -39,7 +39,7 @@ class Leads {
   /// `id` of the interstitial whose lead button was tapped.
   ///
   /// Sending the same lead again is harmless. A connection failure, a timeout
-  /// or a server error is retried once after a second; a rate limit once after
+  /// or a 5xx server error is retried once after a second; a rate limit once after
   /// two seconds. The call can take about twelve seconds in the worst case.
   ///
   /// Throws a [GantryNotIdentifiedException] before `Gantry.identify`, a
@@ -71,7 +71,8 @@ class Leads {
       _log.debug('Lead could not be sent; retrying once');
       await _delay(_retryDelay);
       await send();
-    } on GantryServerException {
+    } on GantryServerException catch (error) {
+      if (error.statusCode < 500) rethrow;
       _log.debug('Lead hit a server error; retrying once');
       await _delay(_retryDelay);
       await send();

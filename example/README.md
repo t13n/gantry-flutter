@@ -1,17 +1,29 @@
-# gantry_example
+# gantry example
 
-A new Flutter project.
+A small app that makes every call of the `gantry` package: it picks and shows
+an interstitial, sends a lead, and loads content cards and a page.
 
-## Getting Started
+It talks to a Gantry server. By default that is a local one at
+`http://localhost:3000` with the development seed data.
 
-This project is a starting point for a Flutter application.
+```
+flutter run                                                       # iOS simulator
+flutter run --dart-define=GANTRY_BASE_URL=http://10.0.2.2:3000    # Android emulator
+```
 
-A few resources to get you started if this is your first Flutter project:
+Against another server:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```
+flutter run --dart-define=GANTRY_BASE_URL=https://app.gantryhq.net \
+            --dart-define=GANTRY_API_KEY=gk_dev_...
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app does not use Firebase. A real app passes
+`(key) => FirebaseRemoteConfig.instance.getString(key)` as `remoteConfig`; the
+example returns fixed values so the flow can be tried without a Firebase
+project.
+
+Plain `http://` is allowed for the local network only: see
+`NSAllowsLocalNetworking` in `ios/Runner/Info.plist` and
+`usesCleartextTraffic` in `android/app/src/debug/AndroidManifest.xml`. An app
+that talks to `https://app.gantryhq.net` needs neither.

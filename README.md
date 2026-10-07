@@ -19,6 +19,14 @@ dependencies:
   gantry: ^0.1.0
 ```
 
+Android release builds need the internet permission in
+`android/app/src/main/AndroidManifest.xml`; Flutter adds it to debug builds
+only:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
 ## Set up
 
 Create one `Gantry` when the app starts and keep it for the app's lifetime.
@@ -57,8 +65,8 @@ digits or `_ - . :`.
 ```dart
 final interstitial = await gantry.interstitials.next();
 if (interstitial != null) {
-  await showMyInterstitial(interstitial);          // your UI
-  await gantry.interstitials.markShown(interstitial);
+  await gantry.interstitials.markShown(interstitial); // it goes on screen now
+  await showMyInterstitial(interstitial);             // your UI
 }
 ```
 
@@ -85,8 +93,9 @@ when there is nothing to show.
 | `daily` | Once per calendar day in the device's time zone. |
 | `everyLaunch` | Once each time the app is launched. |
 
-The SDK counts a display only when you call `markShown`, so call it when the
-interstitial is actually on screen. The record is kept per device, not per
+The SDK counts a display only when you call `markShown`. Call it as the
+interstitial goes on screen, not after the user closes it: if the app is killed
+while the interstitial is open, a `once` campaign would otherwise show again. The record is kept per device, not per
 customer, and survives `reset()`.
 
 **Buttons**
@@ -173,7 +182,7 @@ card.title.tr;
 | --- | --- |
 | `interstitials.next()` | Returns null. |
 | `interstitials.markShown()` | Does nothing. |
-| `contents.list()`, `pages.get()` | Returns the previous result if there is one, otherwise throws. |
+| `contents.list()`, `pages.get()` | Returns the previous result if there is one, otherwise throws. A rejected API key always throws. |
 | `leads.submit()` | Throws after one retry. |
 
 Everything thrown for a runtime problem is a `GantryException`:
@@ -207,7 +216,7 @@ failure by design.
 
 | Option | Default | Use |
 | --- | --- | --- |
-| `platform` | detected | Pass it when the app runs somewhere other than iOS or Android. |
+| `platform` | detected from the device | Override the detected platform, for example in tests. |
 | `baseUrl` | `https://app.gantryhq.net` | A self-hosted or local Gantry. |
 | `httpClient` | a new `http.Client` | Your own client, for example with certificate pinning. |
 | `store` | `shared_preferences` | Where the record of shown interstitials is kept. |

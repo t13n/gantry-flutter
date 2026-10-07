@@ -28,12 +28,24 @@ String campaign(String id,
   }));
 }
 
+class _BrokenStore implements GantryStore {
+  @override
+  Future<String?> read(String key) => throw StateError('read failed');
+
+  @override
+  Future<void> write(String key, String value) =>
+      throw StateError('write failed');
+
+  @override
+  Future<void> remove(String key) => throw StateError('remove failed');
+}
+
 void main() {
   final now = DateTime.utc(2026, 10, 7, 12);
   late List<http.Request> requests;
   late List<GantryLogEvent> logs;
   late Session session;
-  late MemoryGantryStore store;
+  late GantryStore store;
 
   Interstitials build({
     Map<String, String?> remoteConfig = const {},
@@ -286,9 +298,13 @@ void main() {
     });
   });
 
-  test('markShown never throws', () async {
+  test('markShown never throws, also when nothing can be saved', () async {
+    store = _BrokenStore();
     final interstitials = build(remoteConfig: {general: campaign('general-1')});
     final interstitial = (await interstitials.next())!;
+
     await expectLater(interstitials.markShown(interstitial), completes);
+    expect(await interstitials.next(), isNull);
+    expect(logs, isNotEmpty);
   });
 }

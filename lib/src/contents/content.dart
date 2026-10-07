@@ -14,6 +14,16 @@ class ContentBody {
   /// https links and images, quotes, code and tables.
   final LocalizedText html;
 
+  @override
+  bool operator ==(Object other) =>
+      other is ContentBody && other.markdown == markdown && other.html == html;
+
+  @override
+  int get hashCode => Object.hash(markdown, html);
+
+  @override
+  String toString() => 'ContentBody(${markdown.tr.length} characters)';
+
   /// Reads `{ "markdown": {...}, "html": {...} }`; returns null when either
   /// form is missing.
   static ContentBody? fromJson(Object? json) {
@@ -73,6 +83,27 @@ class ContentCard {
   /// When the card was published.
   final DateTime publishedAt;
 
+  @override
+  bool operator ==(Object other) =>
+      other is ContentCard &&
+      other.key == key &&
+      other.category == category &&
+      other.title == title &&
+      other.summary == summary &&
+      other.body == body &&
+      other.imageUrl == imageUrl &&
+      other.action == action &&
+      other.startAt == startAt &&
+      other.endAt == endAt &&
+      other.publishedAt == publishedAt;
+
+  @override
+  int get hashCode => Object.hash(key, category, title, summary, body, imageUrl,
+      action, startAt, endAt, publishedAt);
+
+  @override
+  String toString() => 'ContentCard($key)';
+
   /// Reads a card object; returns null when it cannot be read.
   static ContentCard? fromJson(Object? json) {
     if (json is! Map || json['schemaVersion'] != 1) return null;
@@ -125,6 +156,20 @@ class ContentPage {
 
   /// When the page was published.
   final DateTime publishedAt;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ContentPage &&
+      other.key == key &&
+      other.title == title &&
+      other.body == body &&
+      other.publishedAt == publishedAt;
+
+  @override
+  int get hashCode => Object.hash(key, title, body, publishedAt);
+
+  @override
+  String toString() => 'ContentPage($key)';
 
   /// Reads a page object; returns null when it cannot be read.
   static ContentPage? fromJson(Object? json) {

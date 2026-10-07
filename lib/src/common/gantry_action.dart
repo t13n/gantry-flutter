@@ -54,6 +54,19 @@ final class GantryRedirectAction extends GantryAction {
 
   /// The deeplink to open, in the app's own scheme.
   final String deeplink;
+
+  @override
+  bool operator ==(Object other) =>
+      other is GantryRedirectAction &&
+      other.deeplink == deeplink &&
+      other.trackingEvent == trackingEvent;
+
+  @override
+  int get hashCode =>
+      Object.hash(GantryRedirectAction, deeplink, trackingEvent);
+
+  @override
+  String toString() => 'GantryRedirectAction($deeplink)';
 }
 
 /// Open an https web page.
@@ -63,16 +76,48 @@ final class GantryWebPageAction extends GantryAction {
 
   /// The https address to open.
   final Uri url;
+
+  @override
+  bool operator ==(Object other) =>
+      other is GantryWebPageAction &&
+      other.url == url &&
+      other.trackingEvent == trackingEvent;
+
+  @override
+  int get hashCode => Object.hash(GantryWebPageAction, url, trackingEvent);
+
+  @override
+  String toString() => 'GantryWebPageAction($url)';
 }
 
 /// Record that the user wants to be contacted; call `gantry.leads.submit`.
 final class GantryLeadAction extends GantryAction {
   /// Creates a lead action.
   const GantryLeadAction({super.trackingEvent});
+
+  @override
+  bool operator ==(Object other) =>
+      other is GantryLeadAction && other.trackingEvent == trackingEvent;
+
+  @override
+  int get hashCode => Object.hash(GantryLeadAction, trackingEvent);
+
+  @override
+  String toString() => 'GantryLeadAction()';
 }
 
 /// Close the interstitial.
 final class GantryDismissAction extends GantryAction {
   /// Creates a dismiss action.
   const GantryDismissAction({super.trackingEvent});
+
+  @override
+  bool operator ==(Object other) =>
+      other is GantryDismissAction && other.trackingEvent == trackingEvent;
+
+  @override
+  int get hashCode => Object.hash(GantryDismissAction, trackingEvent);
+
+  @override
+  String toString() => 'GantryDismissAction()';
 }
