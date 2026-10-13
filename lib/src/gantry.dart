@@ -11,6 +11,7 @@ import 'interstitials/frequency_tracker.dart';
 import 'interstitials/interstitials.dart';
 import 'leads/leads.dart';
 import 'log/gantry_log.dart';
+import 'push/push_buckets.dart';
 import 'session.dart';
 import 'store/gantry_store.dart';
 import 'store/shared_preferences_store.dart';
@@ -31,6 +32,10 @@ import 'version.dart';
 /// gantry.identify(customerId); // after sign-in
 /// gantry.reset();              // after sign-out
 /// ```
+///
+/// To let Gantry send a topic push in parts, also pass
+/// `subscribeToTopic: FirebaseMessaging.instance.subscribeToTopic` and call
+/// `gantry.push.sync()` on every start.
 class Gantry {
   /// Creates the SDK for one Gantry environment.
   ///
@@ -43,8 +48,10 @@ class Gantry {
   /// * [baseUrl] defaults to [defaultBaseUrl].
   /// * [httpClient] replaces the HTTP client; the SDK does not close a client
   ///   it was given.
+  /// * [subscribeToTopic] subscribes the device to an FCM topic. Without it
+  ///   [push] does nothing.
   /// * [store] replaces `shared_preferences` as the place where the SDK
-  ///   remembers which interstitials were shown.
+  ///   remembers which interstitials were shown and the device's push bucket.
   /// * [onLog] receives the SDK's log events. Nothing is printed without it.
   ///
   /// Throws an [ArgumentError] for a malformed key, version or address, or a
@@ -56,6 +63,7 @@ class Gantry {
     RemoteConfigReader? remoteConfig,
     Uri? baseUrl,
     http.Client? httpClient,
+    TopicSubscriber? subscribeToTopic,
     GantryStore? store,
     GantryLogger? onLog,
   }) {
@@ -86,6 +94,7 @@ class Gantry {
       userAgent: 'gantry-flutter/$packageVersion',
     );
     final cache = ResponseCache(now: now, log: log);
+    final resolvedStore = store ?? SharedPreferencesGantryStore();
 
     return Gantry._(
       client: client,
@@ -95,8 +104,7 @@ class Gantry {
         api: api,
         session: session,
         remoteConfig: remoteConfig,
-        frequency: FrequencyTracker(
-            store: store ?? SharedPreferencesGantryStore(), now: now, log: log),
+        frequency: FrequencyTracker(store: resolvedStore, now: now, log: log),
         platform: resolvedPlatform,
         appVersion: appVersion,
         now: now,
@@ -111,6 +119,8 @@ class Gantry {
       contents: Contents(
           api: api, cache: cache, platform: resolvedPlatform, log: log),
       pages: Pages(api: api, cache: cache, log: log),
+      push: PushBuckets(
+          store: resolvedStore, subscribe: subscribeToTopic, log: log),
     );
   }
 
@@ -122,6 +132,7 @@ class Gantry {
     required this.leads,
     required this.contents,
     required this.pages,
+    required this.push,
   })  : _client = client,
         _ownsClient = ownsClient,
         _session = session;
@@ -148,6 +159,9 @@ class Gantry {
   /// Loads static pages.
   final Pages pages;
 
+  /// Keeps the device in its push bucket.
+  final PushBuckets push;
+
   /// Whether a customer is currently identified.
   bool get isIdentified => _session.customerId != null;
 
@@ -160,7 +174,8 @@ class Gantry {
 
   /// Forgets the customer and their cached data. Call it on sign-out.
   ///
-  /// The record of shown interstitials is kept: it belongs to the device.
+  /// The record of shown interstitials and the push bucket are kept: they
+  /// belong to the device.
   void reset() => _session.reset();
 
   /// Releases the HTTP client the SDK created. Call it when the SDK is no

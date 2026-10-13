@@ -2,7 +2,7 @@ name: gantry
 description: >-
   Client SDK for Gantry. Fetch interstitial campaigns, submit leads and load
   content cards and pages in Flutter apps, with caching and retries built in.
-version: 0.1.0
+version: 0.2.0
 homepage: https://gantryhq.net
 repository: https://github.com/t13n/gantry-flutter
 issue_tracker: https://github.com/t13n/gantry-flutter/issues

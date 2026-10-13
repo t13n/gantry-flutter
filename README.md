@@ -4,8 +4,9 @@ Client SDK for [Gantry](https://gantryhq.net). It lets a Flutter app
 
 - pick the **interstitial** campaign to show when the app opens,
 - send a **lead** when the user asks to be contacted,
-- load **content cards** (announcements, campaigns, banners) and
-- load **static pages** (FAQ, privacy notice),
+- load **content cards** (announcements, campaigns, banners),
+- load **static pages** (FAQ, privacy notice) and
+- join a **push bucket**, so a topic push can be sent in parts,
 
 with caching, retries, campaign priority and display frequency handled for you.
 The SDK gives you typed data; your app draws the UI.
@@ -165,6 +166,44 @@ suits your app.
 Cards and pages are cached in memory for a minute. After that the SDK checks
 for changes, and if that check fails it returns the previous result.
 
+## Push buckets
+
+Gantry can send a topic push in parts, for example a tenth of the audience
+every ten minutes, so the users who tap it do not reach your backend all at
+once. For that each device joins a bucket. The SDK picks the device's bucket
+and names the topics; your app does the subscribing, because the SDK does not
+depend on Firebase.
+
+```dart
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+final gantry = Gantry(
+  apiKey: 'gk_prod_...',
+  appVersion: '2.3.1',
+  subscribeToTopic: FirebaseMessaging.instance.subscribeToTopic,
+);
+
+await gantry.push.sync(); // on every start, once notifications are allowed
+
+FirebaseMessaging.instance.onTokenRefresh
+    .listen((_) => gantry.push.sync());
+```
+
+`sync()` subscribes the device to three topics, for example `bo_bucket_37`,
+`bo_decile_3` and `bo_bucketed`. It never throws; a failed subscription is
+reported at `GantryLogLevel.warning` and tried again on the next `sync()`.
+
+- The bucket is a random number from 0 to 99. It belongs to the device: it is
+  kept in the `store` and survives `reset()`.
+- Keep subscribing to your own topics (`all`, `news`, ...) as before. The SDK
+  only manages the `bo_` bucket topics.
+- A device that has not joined a bucket still receives a staged push: it gets
+  it in the last step, together with every other such device.
+- Receiving and showing the notification stays in your app.
+
+Staged sending is switched on per app in Gantry, once the version that calls
+`sync()` is live.
+
 ## Texts in two languages
 
 Texts are `LocalizedText` values with a Turkish text and an optional English
@@ -219,7 +258,8 @@ failure by design.
 | `platform` | detected from the device | Override the detected platform, for example in tests. |
 | `baseUrl` | `https://app.gantryhq.net` | A self-hosted or local Gantry. |
 | `httpClient` | a new `http.Client` | Your own client, for example with certificate pinning. |
-| `store` | `shared_preferences` | Where the record of shown interstitials is kept. |
+| `store` | `shared_preferences` | Where the record of shown interstitials and the push bucket are kept. |
+| `subscribeToTopic` | none | How the SDK subscribes the device to its push bucket topics. |
 
 ## About the API key
 
