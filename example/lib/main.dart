@@ -54,6 +54,8 @@ class _ExampleScreenState extends State<ExampleScreen> {
       appVersion: '2.3.1',
       baseUrl: Uri.parse(_baseUrl),
       remoteConfig: _readRemoteConfig,
+      // A real app passes FirebaseMessaging.instance.subscribeToTopic.
+      subscribeToTopic: (topic) async => _say('Would subscribe to $topic'),
       onLog: (event) => _say(event.toString()),
     );
   }
@@ -201,6 +203,8 @@ class _ExampleScreenState extends State<ExampleScreen> {
     }
   }
 
+  Future<void> _syncPushBuckets() => _gantry.push.sync();
+
   Future<void> _loadPage() async {
     try {
       final page = await _gantry.pages.get('kvkk');
@@ -290,6 +294,10 @@ class _ExampleScreenState extends State<ExampleScreen> {
               FilledButton.tonal(
                 onPressed: _loadPage,
                 child: const Text('Load page kvkk'),
+              ),
+              FilledButton.tonal(
+                onPressed: _syncPushBuckets,
+                child: const Text('Sync push buckets'),
               ),
             ],
           ),

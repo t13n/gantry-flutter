@@ -2,7 +2,8 @@
 ///
 /// The default implementation uses `shared_preferences`. Implement this to
 /// keep the data elsewhere and pass it as `store` to `Gantry`. The SDK stores
-/// one value: which interstitials were shown and when.
+/// two values: which interstitials were shown and when, and the device's push
+/// bucket.
 abstract interface class GantryStore {
   /// Returns the value saved under [key], or null.
   Future<String?> read(String key);
